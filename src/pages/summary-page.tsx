@@ -19,7 +19,6 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { getInventory, getOverview } from "@/services/dashboard"
 import { exportInventory, getHostList, updateHost } from "@/services/hosts"
@@ -162,8 +161,8 @@ function InventoryView() {
         </CardHeader>
         <CardContent className="p-3">
           {items.length ? (
-            <ScrollArea className="max-w-full">
-              <Table>
+            <div className="max-w-full overflow-x-auto">
+              <Table className="min-w-max">
                 <TableHeader>
                   <TableRow>
                     <TableHead>ID</TableHead>
@@ -178,7 +177,9 @@ function InventoryView() {
                     <TableHead>安装日期</TableHead>
                     <TableHead>维保到期</TableHead>
                     <TableHead>MAC</TableHead>
-                    <TableHead>操作</TableHead>
+                    <TableHead className="sticky right-0 z-10 bg-muted/20 shadow-[-8px_0_8px_-8px_hsl(var(--border))]">
+                      操作
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -219,6 +220,7 @@ function InventoryView() {
                             {editing ? (
                               <Input
                                 aria-label={label}
+                                className="w-32 min-w-0"
                                 value={draft[key] ?? String(item[key] ?? "")}
                                 onChange={(event) => setDraft((current) => ({ ...current, [key]: event.target.value }))}
                               />
@@ -231,10 +233,11 @@ function InventoryView() {
                           ["date_hw_install", "安装日期"],
                           ["date_hw_expiry", "维保到期"],
                         ].map(([key, label]) => (
-                          <TableCell key={key} className="min-w-36">
+                          <TableCell key={key} className="min-w-32">
                             {editing ? (
                               <Input
                                 aria-label={label}
+                                className="w-36 min-w-0"
                                 type="date"
                                 value={toDateInputValue(draft[key] ?? item[key])}
                                 onChange={(event) => setDraft((current) => ({ ...current, [key]: event.target.value }))}
@@ -244,8 +247,8 @@ function InventoryView() {
                             )}
                           </TableCell>
                         ))}
-                        <TableCell>
-                          <div className="flex gap-2">
+                        <TableCell className="sticky right-0 z-10 bg-background shadow-[-8px_0_8px_-8px_hsl(var(--border))]">
+                          <div className="flex min-w-36 gap-2">
                             {editing ? (
                               <>
                                 <Button size="sm" onClick={() => saveMutation.mutate()}>
@@ -291,7 +294,7 @@ function InventoryView() {
                   })}
                 </TableBody>
               </Table>
-            </ScrollArea>
+            </div>
           ) : (
             <Empty>
               <EmptyHeader>
