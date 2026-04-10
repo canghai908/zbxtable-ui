@@ -1,21 +1,29 @@
-import { Button } from "@/components/ui/button"
+import { Suspense, lazy } from "react"
+import { Navigate, Route, Routes } from "react-router-dom"
 
-export function App() {
-  return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
-      </div>
-    </div>
-  )
+import { AppRoot } from "@/components/app-root"
+import { Skeleton } from "@/components/ui/skeleton"
+
+const InstallPage = lazy(() => import("@/pages/install-page").then((module) => ({ default: module.InstallPage })))
+const LoginPage = lazy(() => import("@/pages/login-page").then((module) => ({ default: module.LoginPage })))
+const ForbiddenPage = lazy(() => import("@/pages/status-pages").then((module) => ({ default: module.ForbiddenPage })))
+const TopologySharePage = lazy(() => import("@/pages/topology-share-page").then((module) => ({ default: module.TopologySharePage })))
+
+function RouteFallback() {
+  return <Skeleton className="min-h-svh w-full rounded-none" />
 }
 
-export default App
+export default function App() {
+  return (
+    <Suspense fallback={<RouteFallback />}>
+      <Routes>
+        <Route path="/install" element={<InstallPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/403" element={<ForbiddenPage />} />
+        <Route path="/share/topology" element={<TopologySharePage />} />
+        <Route path="/*" element={<AppRoot />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Suspense>
+  )
+}

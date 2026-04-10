@@ -1,0 +1,91 @@
+import i18n from "i18next"
+import { initReactI18next } from "react-i18next"
+
+const resources = {
+  "zh-CN": {
+    translation: {
+      appName: "ZbxTable",
+      login: "登录",
+      logout: "退出登录",
+      install: "安装系统",
+      refresh: "刷新",
+      create: "新建",
+      edit: "编辑",
+      delete: "删除",
+      save: "保存",
+      cancel: "取消",
+      search: "查询",
+      reset: "重置",
+      export: "导出",
+      details: "详情",
+      noData: "暂无数据",
+      username: "用户名",
+      password: "密码",
+      submit: "提交",
+      systemName: "系统名称",
+      apiRawEditor: "原始 JSON 编辑器",
+      tokenExpired: "登录状态已失效，请重新登录",
+    },
+  },
+  "en-US": {
+    translation: {
+      appName: "ZbxTable",
+      login: "Login",
+      logout: "Logout",
+      install: "Install",
+      refresh: "Refresh",
+      create: "Create",
+      edit: "Edit",
+      delete: "Delete",
+      save: "Save",
+      cancel: "Cancel",
+      search: "Search",
+      reset: "Reset",
+      export: "Export",
+      details: "Details",
+      noData: "No data",
+      username: "Username",
+      password: "Password",
+      submit: "Submit",
+      systemName: "System Name",
+      apiRawEditor: "Raw JSON editor",
+      tokenExpired: "Session expired",
+    },
+  },
+  "zh-TW": {
+    translation: {
+      appName: "ZbxTable",
+      login: "登入",
+      logout: "登出",
+      install: "安裝系統",
+      refresh: "重新整理",
+      create: "新增",
+      edit: "編輯",
+      delete: "刪除",
+      save: "儲存",
+      cancel: "取消",
+      search: "查詢",
+      reset: "重設",
+      export: "匯出",
+      details: "詳情",
+      noData: "暫無資料",
+      username: "使用者名稱",
+      password: "密碼",
+      submit: "提交",
+      systemName: "系統名稱",
+      apiRawEditor: "原始 JSON 編輯器",
+      tokenExpired: "登入狀態已失效，請重新登入",
+    },
+  },
+}
+
+void i18n.use(initReactI18next).init({
+  resources,
+  lng: "zh-CN",
+  fallbackLng: "zh-CN",
+  interpolation: {
+    escapeValue: false,
+  },
+})
+
+export default i18n
