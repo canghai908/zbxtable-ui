@@ -3,6 +3,12 @@ import { toast } from "sonner"
 
 import type { ApiEnvelope, PagedResult } from "@/lib/types"
 import { clearSession, getToken } from "@/lib/session"
+import { useAuthStore } from "@/stores/auth-store"
+
+function resetClientAuthState() {
+  clearSession()
+  useAuthStore.getState().reset()
+}
 
 export const http = axios.create({
   timeout: 20000,
@@ -24,7 +30,7 @@ http.interceptors.response.use(
   (response) => {
     const payload = response.data as ApiEnvelope<unknown>
     if (payload?.code === 50014) {
-      clearSession()
+      resetClientAuthState()
       window.location.href = "/login"
       throw new Error("token expired")
     }
@@ -34,7 +40,7 @@ http.interceptors.response.use(
     const message =
       error?.response?.data?.message ?? error?.message ?? "请求失败"
     if (error?.response?.status === 401) {
-      clearSession()
+      resetClientAuthState()
       window.location.href = "/login"
     } else {
       toast.error(message)

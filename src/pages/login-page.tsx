@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { getPublicSystemInfo, getRoutesConfig, login } from "@/services/core"
-import { setToken } from "@/lib/session"
+import { getToken, setToken } from "@/lib/session"
 import { useAuthStore } from "@/stores/auth-store"
 import { useSystemStore } from "@/stores/system-store"
 
@@ -49,7 +49,7 @@ export function LoginPage() {
     document.title = `${systemName || "ZbxTable"} | 登录`
   }, [systemName])
 
-  if (user) {
+  if (user && getToken()) {
     return <Navigate to="/" replace />
   }
 
