@@ -109,7 +109,7 @@ export function AlarmAnalysisPage() {
 
   return (
     <PageLayout>
-      <Card className="border-0 shadow-none ring-1 ring-border/60">
+      <Card className="console-panel border-0">
         <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <CardTitle className="text-sm font-medium">筛选条件</CardTitle>
@@ -166,7 +166,7 @@ export function AlarmAnalysisPage() {
         </CardContent>
       </Card>
       <div className="grid gap-4 xl:grid-cols-3">
-        <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+        <Card className="console-panel border-0">
           <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
             <div className="flex items-center justify-between gap-3">
               <CardTitle className="text-sm font-medium">告警总量</CardTitle>
@@ -174,7 +174,7 @@ export function AlarmAnalysisPage() {
             </div>
           </CardHeader>
         </Card>
-        <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+        <Card className="console-panel border-0">
           <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
             <div className="flex items-center justify-between gap-3">
               <CardTitle className="text-sm font-medium">最高等级</CardTitle>
@@ -182,7 +182,7 @@ export function AlarmAnalysisPage() {
             </div>
           </CardHeader>
         </Card>
-        <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+        <Card className="console-panel border-0">
           <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
             <div className="flex items-center justify-between gap-3">
               <CardTitle className="text-sm font-medium">TOP 主机</CardTitle>
@@ -194,7 +194,7 @@ export function AlarmAnalysisPage() {
 
       {levelRows.length || hostRows.length ? (
         <div className="grid gap-5 xl:grid-cols-2">
-          <Card className="border-0 shadow-none ring-1 ring-border/60">
+          <Card className="console-panel border-0">
             <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
               <div className="flex items-center justify-between gap-3">
                 <CardTitle className="text-sm font-medium">主机排行</CardTitle>
@@ -209,7 +209,7 @@ export function AlarmAnalysisPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-none ring-1 ring-border/60">
+          <Card className="console-panel border-0">
             <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
               <div className="flex items-center justify-between gap-3">
                 <CardTitle className="text-sm font-medium">等级分布</CardTitle>

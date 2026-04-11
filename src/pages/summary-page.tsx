@@ -113,9 +113,12 @@ function InventoryView() {
 
   return (
     <div className="grid gap-5 xl:grid-cols-[280px_minmax(0,1fr)]">
-      <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+      <Card className="console-panel border-0">
         <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
-          <CardTitle className="text-sm font-medium">资产树</CardTitle>
+          <div className="flex items-center justify-between gap-3">
+            <CardTitle className="text-sm font-medium">资产树</CardTitle>
+            <Badge variant="outline">目录</Badge>
+          </div>
         </CardHeader>
         <CardContent className="flex flex-col gap-3 p-4">
           {(tree[0]?.children ?? inventoryCategories).map((node) => {
@@ -126,7 +129,7 @@ function InventoryView() {
               <Button
                 key={node.id}
                 variant={active ? "default" : "outline"}
-                className="justify-start"
+                className="justify-start rounded-xl"
                 onClick={() => {
                   setSelectedNodeId(node.id)
                   setPage(1)
@@ -140,11 +143,12 @@ function InventoryView() {
         </CardContent>
       </Card>
 
-      <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+      <Card className="console-panel border-0">
         <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
           <div className="flex items-center justify-between gap-3">
             <div className="flex min-w-0 flex-col gap-1">
               <CardTitle className="text-sm font-medium">{selectedCategory.name}</CardTitle>
+              <div className="text-xs text-muted-foreground">资产台账与硬件字段维护</div>
             </div>
             <Button
               variant="outline"
@@ -157,7 +161,11 @@ function InventoryView() {
               导出
             </Button>
           </div>
-          <div className="text-sm text-muted-foreground">共 {total} 条</div>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>共 {total} 条</span>
+            <span>·</span>
+            <span>支持行内维护</span>
+          </div>
         </CardHeader>
         <CardContent className="p-3">
           {items.length ? (
@@ -211,37 +219,31 @@ function InventoryView() {
                           </Popover>
                         </TableCell>
                         {[
-                          ["location", "位置"],
-                          ["department", "部门"],
-                          ["resource_id", "资产编号"],
-                          ["mac", "MAC"],
-                        ].map(([key, label]) => (
+                          ["location", "位置", "text"],
+                          ["department", "部门", "text"],
+                          ["resource_id", "资产编号", "text"],
+                          ["date_hw_install", "安装日期", "date"],
+                          ["date_hw_expiry", "维保到期", "date"],
+                          ["mac", "MAC", "text"],
+                        ].map(([key, label, type]) => (
                           <TableCell key={key} className="min-w-32">
                             {editing ? (
-                              <Input
-                                aria-label={label}
-                                className="w-32 min-w-0"
-                                value={draft[key] ?? String(item[key] ?? "")}
-                                onChange={(event) => setDraft((current) => ({ ...current, [key]: event.target.value }))}
-                              />
-                            ) : (
-                              String(item[key] ?? "-")
-                            )}
-                          </TableCell>
-                        ))}
-                        {[
-                          ["date_hw_install", "安装日期"],
-                          ["date_hw_expiry", "维保到期"],
-                        ].map(([key, label]) => (
-                          <TableCell key={key} className="min-w-32">
-                            {editing ? (
-                              <Input
-                                aria-label={label}
-                                className="w-36 min-w-0"
-                                type="date"
-                                value={toDateInputValue(draft[key] ?? item[key])}
-                                onChange={(event) => setDraft((current) => ({ ...current, [key]: event.target.value }))}
-                              />
+                              type === "date" ? (
+                                <Input
+                                  aria-label={label}
+                                  className="w-36 min-w-0"
+                                  type="date"
+                                  value={toDateInputValue(draft[key] ?? item[key])}
+                                  onChange={(event) => setDraft((current) => ({ ...current, [key]: event.target.value }))}
+                                />
+                              ) : (
+                                <Input
+                                  aria-label={label}
+                                  className="w-32 min-w-0"
+                                  value={draft[key] ?? String(item[key] ?? "")}
+                                  onChange={(event) => setDraft((current) => ({ ...current, [key]: event.target.value }))}
+                                />
+                              )
                             ) : (
                               String(item[key] ?? "-")
                             )}
@@ -348,7 +350,7 @@ function OverviewSection({ title, items }: { title: string; items: HostRecord[] 
   const alarmCount = items.filter((item) => Number(item.alarm ?? 0) > 0).length
 
   return (
-    <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+    <Card className="console-panel border-0">
       <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
         <div className="flex items-center justify-between gap-3">
           <div className="flex flex-col gap-1">
@@ -414,7 +416,7 @@ function OverviewView() {
           const warning = section.items.filter((item) => String(item.available ?? "") === "1" && Number(item.alarm ?? 0) > 0).length
           const error = section.items.filter((item) => ["0", "2"].includes(String(item.available ?? ""))).length
           return (
-            <Card key={section.title} className="border-0 bg-background shadow-none ring-1 ring-border/60">
+            <Card key={section.title} className="console-panel border-0">
               <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
                 <CardTitle className="text-2xl">{formatCount(section.items.length)}</CardTitle>
               </CardHeader>

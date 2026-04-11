@@ -3,8 +3,9 @@ import { RefreshCw, Rocket } from "lucide-react"
 import { toast } from "sonner"
 
 import { PageLayout } from "@/components/page-layout"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { checkSystemUpdate, doSystemUpdate, getSystemVersion } from "@/services/resources"
 
 declare const __APP_VERSION__: string
@@ -28,9 +29,12 @@ export function VersionPage() {
   return (
     <PageLayout>
       <div className="grid gap-4 xl:grid-cols-2">
-        <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+        <Card className="console-panel border-0">
           <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
-            <div className="flex items-center justify-end gap-3 text-xs text-muted-foreground">v{__APP_VERSION__}</div>
+            <div className="flex items-center justify-between gap-3">
+              <CardTitle className="text-sm font-medium">版本信息</CardTitle>
+              <Badge variant="outline">v{__APP_VERSION__}</Badge>
+            </div>
           </CardHeader>
           <CardContent className="grid gap-2 p-3 text-sm">
             <div>前端版本：{__APP_VERSION__}</div>
@@ -39,9 +43,9 @@ export function VersionPage() {
             <div>构建时间：{String(versionQuery.data?.buildTime ?? "-")}</div>
           </CardContent>
         </Card>
-        <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+        <Card className="console-panel border-0">
           <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
-            <div className="text-sm font-medium">系统更新</div>
+            <CardTitle className="text-sm font-medium">系统更新</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-3 p-3">
             <div className="flex gap-2">

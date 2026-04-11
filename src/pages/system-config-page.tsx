@@ -262,7 +262,7 @@ export function SystemConfigPage() {
   return (
     <PageLayout>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="gap-4">
-        <TabsList className="h-auto flex-wrap justify-start gap-2 rounded-xl bg-muted/40 p-1">
+        <TabsList className="app-shell-surface h-auto flex-wrap justify-start gap-2 rounded-2xl border p-1.5">
           {tabMeta.map((tab) => (
             <TabsTrigger key={tab.value} value={tab.value}>
               {tab.label}
@@ -272,10 +272,13 @@ export function SystemConfigPage() {
 
         {tabMeta.map((tab) => (
           <TabsContent key={tab.value} value={tab.value}>
-            <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+            <Card className="console-panel border-0">
               <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <CardTitle className="text-sm font-medium">{tab.label}配置</CardTitle>
+                  <div className="flex min-w-0 flex-col gap-1">
+                    <CardTitle className="text-sm font-medium">{tab.label}配置</CardTitle>
+                    <div className="text-xs text-muted-foreground">集中维护当前分组的系统参数与连接配置</div>
+                  </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge variant="secondary">{grouped[tab.value]?.length ?? 0} 项</Badge>
                     <Button size="sm" onClick={() => saveGroup(tab.value)}>
@@ -312,7 +315,7 @@ export function SystemConfigPage() {
           <DialogHeader>
             <DialogTitle>测试邮件配置</DialogTitle>
           </DialogHeader>
-          <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+          <Card className="console-panel border-0">
             <CardContent className="p-3">
               <FieldGroup>
                 <Field>
@@ -336,7 +339,7 @@ export function SystemConfigPage() {
           <DialogHeader>
             <DialogTitle>测试企业微信配置</DialogTitle>
           </DialogHeader>
-          <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+          <Card className="console-panel border-0">
             <CardContent className="p-3">
               <FieldGroup>
                 <Field>

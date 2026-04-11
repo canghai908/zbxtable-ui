@@ -108,10 +108,13 @@ export function BandwidthManagementPage() {
 
   return (
     <PageLayout>
-      <Card className="border-0 shadow-none ring-1 ring-border/60">
+      <Card className="console-panel border-0">
         <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <CardTitle className="text-sm font-medium">出口列表</CardTitle>
+            <div className="flex min-w-0 flex-col gap-1">
+              <CardTitle className="text-sm font-medium">出口列表</CardTitle>
+              <div className="text-xs text-muted-foreground">出口名称、流量指标、排序与启停状态</div>
+            </div>
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="secondary">共 {configs.length} 条配置</Badge>
               <Button
@@ -207,7 +210,7 @@ export function BandwidthManagementPage() {
           <DialogHeader>
             <DialogTitle>{editingId ? "编辑出口配置" : "新增出口配置"}</DialogTitle>
           </DialogHeader>
-          <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+          <Card className="console-panel border-0">
             <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
               <CardTitle className="text-sm font-medium">基础配置</CardTitle>
             </CardHeader>

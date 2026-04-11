@@ -142,7 +142,7 @@ export function RuleManagementPage({ mType }: Props) {
 
   return (
     <PageLayout>
-      <Card className="border-0 shadow-none ring-1 ring-border/60">
+      <Card className="console-panel border-0">
         <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <CardTitle className="text-sm font-medium">筛选条件</CardTitle>
@@ -183,10 +183,13 @@ export function RuleManagementPage({ mType }: Props) {
           </FieldGroup>
         </CardContent>
       </Card>
-      <Card className="border-0 shadow-none ring-1 ring-border/60">
+      <Card className="console-panel border-0">
         <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <CardTitle className="text-sm font-medium">规则列表</CardTitle>
+            <div className="flex min-w-0 flex-col gap-1">
+              <CardTitle className="text-sm font-medium">规则列表</CardTitle>
+              <div className="text-xs text-muted-foreground">条件匹配、通知通道、时间窗与接收对象</div>
+            </div>
             <Badge variant="secondary">共 {items.length} 条规则</Badge>
           </div>
         </CardHeader>
@@ -314,7 +317,7 @@ export function RuleManagementPage({ mType }: Props) {
                 </div>
               </Field>
             </FieldGroup>
-            <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+            <Card className="console-panel border-0">
               <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
                 <CardTitle className="text-sm font-medium">匹配条件</CardTitle>
               </CardHeader>

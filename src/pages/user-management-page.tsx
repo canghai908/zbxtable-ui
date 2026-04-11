@@ -117,7 +117,7 @@ export function UserManagementPage() {
 
   return (
     <PageLayout>
-      <Card className="border-0 shadow-none ring-1 ring-border/60">
+      <Card className="console-panel border-0">
         <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <CardTitle className="text-sm font-medium">筛选条件</CardTitle>
@@ -181,10 +181,13 @@ export function UserManagementPage() {
           </FieldGroup>
         </CardContent>
       </Card>
-      <Card className="border-0 shadow-none ring-1 ring-border/60">
+      <Card className="console-panel border-0">
         <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <CardTitle className="text-sm font-medium">用户列表</CardTitle>
+            <div className="flex min-w-0 flex-col gap-1">
+              <CardTitle className="text-sm font-medium">用户列表</CardTitle>
+              <div className="text-xs text-muted-foreground">账号、角色、通知方式与启停状态</div>
+            </div>
             <Badge variant="secondary">共 {items.length} 位用户</Badge>
           </div>
         </CardHeader>
@@ -319,7 +322,7 @@ export function UserManagementPage() {
           <DialogHeader>
             <DialogTitle>{editingId ? "编辑用户" : "新增用户"}</DialogTitle>
           </DialogHeader>
-          <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+          <Card className="console-panel border-0">
             <CardContent className="p-3">
               <FieldGroup>
                 <Field>

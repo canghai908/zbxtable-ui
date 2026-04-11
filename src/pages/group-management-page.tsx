@@ -98,7 +98,7 @@ export function GroupManagementPage() {
 
   return (
     <PageLayout>
-      <Card className="border-0 shadow-none ring-1 ring-border/60">
+      <Card className="console-panel border-0">
         <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <CardTitle className="text-sm font-medium">筛选条件</CardTitle>
@@ -139,10 +139,13 @@ export function GroupManagementPage() {
           </FieldGroup>
         </CardContent>
       </Card>
-      <Card className="border-0 shadow-none ring-1 ring-border/60">
+      <Card className="console-panel border-0">
         <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <CardTitle className="text-sm font-medium">组织列表</CardTitle>
+            <div className="flex min-w-0 flex-col gap-1">
+              <CardTitle className="text-sm font-medium">组织列表</CardTitle>
+              <div className="text-xs text-muted-foreground">组织结构、备注与成员归属维护</div>
+            </div>
             <Badge variant="secondary">共 {items.length} 个组织</Badge>
           </div>
         </CardHeader>
@@ -233,7 +236,7 @@ export function GroupManagementPage() {
           <DialogHeader>
             <DialogTitle>{editingId ? "编辑组织" : "新增组织"}</DialogTitle>
           </DialogHeader>
-          <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+          <Card className="console-panel border-0">
             <CardContent className="p-3">
               <FieldGroup>
                 <Field>
@@ -258,7 +261,7 @@ export function GroupManagementPage() {
           <DialogHeader>
             <DialogTitle>{memberGroupName} - 成员维护</DialogTitle>
           </DialogHeader>
-          <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+          <Card className="console-panel border-0">
             <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
               <div className="flex items-center justify-between gap-3">
                 <CardTitle className="text-sm font-medium">成员列表</CardTitle>

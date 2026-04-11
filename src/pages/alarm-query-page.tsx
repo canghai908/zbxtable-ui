@@ -227,7 +227,7 @@ export function AlarmQueryPage() {
 
   return (
     <PageLayout>
-      <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+      <Card className="console-panel border-0">
         <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <CardTitle className="text-sm font-medium">筛选条件</CardTitle>
@@ -332,10 +332,13 @@ export function AlarmQueryPage() {
           </FieldGroup>
         </CardContent>
       </Card>
-      <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+      <Card className="console-panel border-0">
         <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
           <div className="flex items-center justify-between gap-3">
-            <CardTitle className="text-sm font-medium">告警列表</CardTitle>
+            <div className="flex min-w-0 flex-col gap-1">
+              <CardTitle className="text-sm font-medium">告警列表</CardTitle>
+              <div className="text-xs text-muted-foreground">支持 AI 分析、通知详情查看与快速转屏蔽规则</div>
+            </div>
             <Badge variant="outline">共 {total} 条</Badge>
           </div>
         </CardHeader>

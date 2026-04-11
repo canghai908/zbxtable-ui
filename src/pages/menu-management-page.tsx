@@ -94,7 +94,7 @@ export function MenuManagementPage() {
 
   return (
     <PageLayout>
-      <Card className="border-0 shadow-none ring-1 ring-border/60">
+      <Card className="console-panel border-0">
         <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <CardTitle className="text-sm font-medium">菜单概览</CardTitle>
@@ -115,9 +115,12 @@ export function MenuManagementPage() {
           </div>
         </CardHeader>
       </Card>
-      <Card className="border-0 shadow-none ring-1 ring-border/60">
+      <Card className="console-panel border-0">
         <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
-          <CardTitle className="text-sm font-medium">菜单列表</CardTitle>
+          <div className="flex min-w-0 flex-col gap-1">
+            <CardTitle className="text-sm font-medium">菜单列表</CardTitle>
+            <div className="text-xs text-muted-foreground">导航层级、路由、权限与显示策略</div>
+          </div>
         </CardHeader>
         <CardContent className="p-0">
           <ScrollArea className="max-w-full">
@@ -209,7 +212,7 @@ export function MenuManagementPage() {
           <DialogHeader>
             <DialogTitle>{editingId ? "编辑菜单" : "新增菜单"}</DialogTitle>
           </DialogHeader>
-          <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+          <Card className="console-panel border-0">
             <CardContent className="p-3">
           <FieldGroup>
             <Field>

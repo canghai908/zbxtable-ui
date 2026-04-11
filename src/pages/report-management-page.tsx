@@ -228,7 +228,7 @@ export function ReportManagementPage() {
         <AlertTitle>多实例报表</AlertTitle>
         <AlertDescription>一个报表任务可组合多个实例、多个主机和监控项，适合做统一汇总。</AlertDescription>
       </Alert>
-      <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+      <Card className="console-panel border-0">
         <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <CardTitle className="text-sm font-medium">筛选条件</CardTitle>
@@ -278,10 +278,13 @@ export function ReportManagementPage() {
           </FieldGroup>
         </CardContent>
       </Card>
-      <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+      <Card className="console-panel border-0">
         <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <CardTitle className="text-sm font-medium">报表列表</CardTitle>
+            <div className="flex min-w-0 flex-col gap-1">
+              <CardTitle className="text-sm font-medium">报表列表</CardTitle>
+              <div className="text-xs text-muted-foreground">任务、实例、执行状态与生成结果</div>
+            </div>
             <Badge variant="secondary">共 {total} 个报表任务</Badge>
           </div>
         </CardHeader>
@@ -465,7 +468,7 @@ export function ReportManagementPage() {
           </DialogHeader>
           <ScrollArea className="max-h-[72vh] pr-3">
             <FieldGroup>
-              <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+              <Card className="console-panel border-0">
                 <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
                   <div className="flex items-center justify-between gap-3">
                     <CardTitle className="text-sm font-medium">基础配置</CardTitle>
@@ -702,7 +705,7 @@ export function ReportManagementPage() {
                   新增主机配置
                 </Button>
               </FieldGroup>
-              <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+              <Card className="console-panel border-0">
                 <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
                   <CardTitle className="text-sm font-medium">{form.report_mode === "realtime" ? "时间范围" : "调度配置"}</CardTitle>
                 </CardHeader>
@@ -800,7 +803,7 @@ export function ReportManagementPage() {
           <DialogHeader>
             <DialogTitle>任务日志</DialogTitle>
           </DialogHeader>
-          <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+          <Card className="console-panel border-0">
             <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
               <div className="flex items-center justify-between gap-3">
                 <CardTitle className="text-sm font-medium">日志列表</CardTitle>

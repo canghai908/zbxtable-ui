@@ -206,10 +206,13 @@ export function MetricMappingPage() {
   return (
     <PageLayout>
       {items.length ? (
-        <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+        <Card className="console-panel border-0">
           <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <CardTitle className="text-sm font-medium">映射列表</CardTitle>
+              <div className="flex min-w-0 flex-col gap-1">
+                <CardTitle className="text-sm font-medium">映射列表</CardTitle>
+                <div className="text-xs text-muted-foreground">实例、主机组、指标字段与初始化状态</div>
+              </div>
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="secondary">共 {items.length} 条映射</Badge>
                 <Button
@@ -356,7 +359,7 @@ export function MetricMappingPage() {
           </DialogHeader>
           <ScrollArea className="max-h-[72vh] pr-3">
             <FieldGroup>
-              <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+              <Card className="console-panel border-0">
                 <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
                   <div className="flex items-center justify-between gap-3">
                     <CardTitle className="text-sm font-medium">基础配置</CardTitle>
@@ -451,7 +454,7 @@ export function MetricMappingPage() {
 
               <FieldSeparator>指标字段</FieldSeparator>
 
-              <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+              <Card className="console-panel border-0">
                 <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
                   <CardTitle className="text-sm font-medium">字段映射</CardTitle>
                 </CardHeader>
@@ -482,7 +485,7 @@ export function MetricMappingPage() {
 
               <FieldSeparator>自动化</FieldSeparator>
 
-              <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+              <Card className="console-panel border-0">
                 <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
                   <CardTitle className="text-sm font-medium">自动化</CardTitle>
                 </CardHeader>
@@ -533,7 +536,7 @@ export function MetricMappingPage() {
           <DialogHeader>
             <DialogTitle>执行历史</DialogTitle>
           </DialogHeader>
-          <Card className="border-0 bg-background shadow-none ring-1 ring-border/60">
+          <Card className="console-panel border-0">
             <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
               <div className="flex items-center justify-between gap-3">
                 <CardTitle className="text-sm font-medium">历史记录</CardTitle>
