@@ -3,12 +3,10 @@ import { useQuery } from "@tanstack/react-query"
 import {
   ArrowDownToLine,
   ArrowUpToLine,
-  BadgeCheck,
   HardDrive,
   Monitor,
   Network,
   Server,
-  ShieldCheck,
 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -197,34 +195,21 @@ export function WorkplacePage() {
   return (
     <div className="flex flex-col gap-6">
       <section className="app-shell-surface overflow-hidden rounded-[1.75rem] border">
-        <div className="grid gap-4 px-4 py-4 md:px-5 md:py-5 xl:grid-cols-[minmax(0,1.4fr)_420px]">
+        <div className="px-4 py-4 md:px-5 md:py-5">
           <div className="flex flex-col gap-4">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="flex max-w-[56rem] flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="h-6 rounded-md px-2 text-[10px] tracking-[0.18em] uppercase">
-                    Operations
-                  </Badge>
-                  <Badge variant="secondary" className="h-6 rounded-md px-2 text-[10px] tracking-[0.18em] uppercase">
-                    Console
-                  </Badge>
-                </div>
-                <h1 className="text-2xl font-semibold tracking-[-0.03em] text-foreground md:text-[2rem]">
-                  运维工作台
-                </h1>
+            <div className="flex max-w-[56rem] flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="h-6 rounded-md px-2 text-[10px] tracking-[0.18em] uppercase">
+                  Operations
+                </Badge>
+                <Badge variant="secondary" className="h-6 rounded-md px-2 text-[10px] tracking-[0.18em] uppercase">
+                  Console
+                </Badge>
               </div>
-              <div className="grid min-w-[240px] gap-2 text-right text-xs text-muted-foreground">
-                <div className="flex items-center justify-end gap-2">
-                  <ShieldCheck className="size-4 text-primary" />
-                  <span>配置与监控状态集中可见</span>
-                </div>
-                <div className="flex items-center justify-end gap-2">
-                  <BadgeCheck className="size-4 text-primary" />
-                  <span>适合长时间巡检与资产管理</span>
-                </div>
-              </div>
+              <h1 className="text-2xl font-semibold tracking-[-0.03em] text-foreground md:text-[2rem]">
+                运维工作台
+              </h1>
             </div>
-
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
               {deviceStats.map((item) => {
                 const Icon = item.icon
@@ -240,28 +225,6 @@ export function WorkplacePage() {
                     <div className="mb-2 flex items-end justify-between gap-3">
                       <div className="text-[1.7rem] font-semibold tracking-[-0.04em]">{item.value}</div>
                       <span className="text-xs text-muted-foreground">{percent}%</span>
-                    </div>
-                    <Progress value={percent} />
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-
-          <div className="console-panel rounded-[1.5rem] border-0 px-4 py-4">
-            <div className="mb-3 flex items-center justify-between gap-3">
-              <div className="text-sm font-medium tracking-[-0.02em]">资源结构</div>
-              <Badge variant="outline">实时概览</Badge>
-            </div>
-            <div className="grid gap-2.5">
-              {deviceStats.map((item) => {
-                const total = deviceStats.reduce((sum, current) => sum + current.value, 0) || 1
-                const percent = Math.round((item.value / total) * 100)
-                return (
-                  <div key={`overview-${item.label}`} className="grid gap-1.5">
-                    <div className="flex items-center justify-between gap-3 text-sm">
-                      <span className="text-muted-foreground">{item.label}</span>
-                      <span className="font-medium tabular-nums">{item.value}</span>
                     </div>
                     <Progress value={percent} />
                   </div>

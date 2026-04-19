@@ -202,8 +202,16 @@ export function getMetricMappingHistory(params: object) {
   return apiPage<Record<string, unknown>>("/v1/metric_mapping/history", params)
 }
 
-export function getConfigList() {
-  return apiGet<Record<string, unknown>[]>("/v1/system/config/")
+export async function getConfigList() {
+  const data = await apiGet<
+    Record<string, unknown>[] | { items?: Record<string, unknown>[]; total?: number }
+  >("/v1/system/config/")
+
+  if (Array.isArray(data)) {
+    return data
+  }
+
+  return Array.isArray(data?.items) ? data.items : []
 }
 
 export function updateConfig(id: string | number, payload: object) {

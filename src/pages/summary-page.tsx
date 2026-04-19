@@ -102,6 +102,7 @@ function InventoryView() {
   const items = (hostsQuery.data?.items ?? []) as HostRecord[]
   const total = Number(hostsQuery.data?.total ?? 0)
   const totalPages = Math.max(Math.ceil(total / pageSize), 1)
+  const treeItems = (tree[0]?.children ?? inventoryCategories)
 
   const toDateInputValue = (value: unknown) => {
     const raw = String(value ?? "")
@@ -121,7 +122,7 @@ function InventoryView() {
           </div>
         </CardHeader>
         <CardContent className="flex flex-col gap-3 p-4">
-          {(tree[0]?.children ?? inventoryCategories).map((node) => {
+          {treeItems.map((node) => {
             const category = inventoryCategories.find((item) => item.id === node.id)
             const Icon = category?.icon ?? Server
             const active = selectedNodeId === node.id
@@ -146,10 +147,7 @@ function InventoryView() {
       <Card className="console-panel border-0">
         <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex min-w-0 flex-col gap-1">
-              <CardTitle className="text-sm font-medium">{selectedCategory.name}</CardTitle>
-              <div className="text-xs text-muted-foreground">资产台账与硬件字段维护</div>
-            </div>
+            <CardTitle className="text-sm font-medium">{selectedCategory.name}</CardTitle>
             <Button
               variant="outline"
               onClick={async () => {
@@ -407,7 +405,6 @@ function OverviewView() {
     { title: "网络设备", items: data.hw_net ?? [] },
     { title: "物理服务器", items: data.hw_srv ?? [] },
   ]
-
   return (
     <div className="flex flex-col gap-5">
       <div className="grid gap-4 xl:grid-cols-4">
@@ -418,12 +415,21 @@ function OverviewView() {
           return (
             <Card key={section.title} className="console-panel border-0">
               <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
-                <CardTitle className="text-2xl">{formatCount(section.items.length)}</CardTitle>
+                <div className="flex items-center justify-between gap-3">
+                  <CardTitle className="text-sm font-medium">{section.title}</CardTitle>
+                  <div className="text-2xl font-semibold">{formatCount(section.items.length)}</div>
+                </div>
               </CardHeader>
-              <CardContent className="p-3 text-sm text-muted-foreground">
-                <div>健康：{healthy}</div>
-                <div>告警：{warning}</div>
-                <div>异常：{error}</div>
+              <CardContent className="grid grid-cols-3 gap-3 p-3 text-sm">
+                <div className="rounded-lg border bg-background px-3 py-2 text-center">
+                  <div className="text-lg font-semibold text-foreground">{healthy}</div>
+                </div>
+                <div className="rounded-lg border bg-background px-3 py-2 text-center">
+                  <div className="text-lg font-semibold text-foreground">{warning}</div>
+                </div>
+                <div className="rounded-lg border bg-background px-3 py-2 text-center">
+                  <div className="text-lg font-semibold text-foreground">{error}</div>
+                </div>
               </CardContent>
             </Card>
           )

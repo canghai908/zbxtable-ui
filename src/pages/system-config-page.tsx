@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { ImageUp, Link, Mail, MessageCircle } from "lucide-react"
+import { ImageUp, Link, Mail, MessageCircle, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
 
 import { PageLayout } from "@/components/page-layout"
@@ -8,10 +8,12 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Field, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field"
+import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from "@/components/ui/empty"
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
 import { getConfigList, testEmailConfig, testWechatConfig, updateConfig, uploadSystemLogo } from "@/services/resources"
 import { useSystemStore } from "@/stores/system-store"
@@ -25,8 +27,8 @@ const tabMeta = [
   { value: "ai", label: "AI" },
 ]
 
-const systemKeys = ["system_name", "system_logo", "zbx_dash", "dash_id", "dash_top_lin_num", "dash_top_win_num", "sync_inventory", "webhook_url"]
-const booleanKeys = ["zbx_dash", "sync_inventory", "wechat_enabled", "email_isSSl"]
+const hiddenSystemKeys = ["demo_mode", "initial_setup_completed"]
+const booleanKeys = ["sync_inventory", "wechat_enabled", "email_isSSl"]
 const passwordKeys = ["email_secret", "wechat_secret", "deepseek_api_key", "encryption_key"]
 
 function detectGroup(key: string) {
@@ -39,7 +41,7 @@ function detectGroup(key: string) {
 function visibleInGroup(item: ConfigItem, group: string, aiType: string) {
   const key = String(item.config_key ?? "")
   if (group === "system") {
-    return systemKeys.includes(key)
+    return detectGroup(key) === "system" && !hiddenSystemKeys.includes(key)
   }
   if (group === "ai") {
     if (key === "ai_type" || key === "alarm_analysis_prompt") return true
@@ -60,6 +62,12 @@ function booleanOptions(key: string) {
     { value: "1", label: "启用" },
     { value: "0", label: "禁用" },
   ]
+}
+
+type ConfigSection = {
+  key: string
+  title: string
+  items: ConfigItem[]
 }
 
 export function SystemConfigPage() {
@@ -98,7 +106,16 @@ export function SystemConfigPage() {
     },
   })
 
-  const items = useMemo(() => (configsQuery.data ?? []) as ConfigItem[], [configsQuery.data])
+  const items = useMemo(() => {
+    const data = configsQuery.data
+    if (Array.isArray(data)) {
+      return data as ConfigItem[]
+    }
+    if (data && typeof data === "object" && Array.isArray((data as { items?: unknown[] }).items)) {
+      return (data as { items: ConfigItem[] }).items
+    }
+    return [] as ConfigItem[]
+  }, [configsQuery.data])
   const valueOf = (item: ConfigItem) => drafts[String(item.config_key ?? "")] ?? String(item.config_value ?? "")
   const aiType = drafts.ai_type ?? String(items.find((item) => item.config_key === "ai_type")?.config_value ?? "ollama")
 
@@ -108,6 +125,36 @@ export function SystemConfigPage() {
       return acc
     }, {})
   }, [aiType, items])
+  const activeTabValue =
+    (grouped[activeTab] ?? []).length > 0
+      ? activeTab
+      : tabMeta.find((tab) => (grouped[tab.value] ?? []).length > 0)?.value ?? activeTab
+
+  const sectioned = useMemo<Record<string, ConfigSection[]>>(() => {
+    const byKey = new Map(items.map((item) => [String(item.config_key ?? ""), item]))
+    const pick = (keys: string[]) => keys.map((key) => byKey.get(key)).filter(Boolean) as ConfigItem[]
+
+    const sections: Record<string, ConfigSection[]> = {
+      system: [
+        { key: "appearance", title: "外观设置", items: pick(["system_name", "system_logo"]) },
+        { key: "runtime", title: "系统设置", items: pick(["dash_top_lin_num", "dash_top_win_num", "sync_inventory", "webhook_url"]) },
+      ].filter((section) => section.items.length > 0),
+      email: [
+        { key: "email", title: "邮件配置", items: grouped.email ?? [] },
+      ].filter((section) => section.items.length > 0),
+      wechat: [
+        { key: "wechat", title: "企业微信配置", items: grouped.wechat ?? [] },
+      ].filter((section) => section.items.length > 0),
+      ai: [
+        { key: "ai_type", title: "AI 引擎", items: pick(["ai_type"]) },
+        ...(aiType === "ollama" ? [{ key: "ollama", title: "Ollama", items: items.filter((item) => String(item.config_key ?? "").startsWith("ollama_")) }] : []),
+        ...(aiType === "deepseek" ? [{ key: "deepseek", title: "Deepseek", items: items.filter((item) => String(item.config_key ?? "").startsWith("deepseek_")) }] : []),
+        { key: "prompt", title: "告警分析", items: pick(["alarm_analysis_prompt"]) },
+      ].filter((section) => section.items.length > 0),
+    }
+
+    return sections
+  }, [aiType, grouped.email, grouped.wechat, items])
 
   const setDraft = (key: string, value: string) => {
     setDrafts((current) => ({ ...current, [key]: value }))
@@ -118,6 +165,10 @@ export function SystemConfigPage() {
       ...item,
       config_value: valueOf(item),
     }))
+    saveItems(payload, group)
+  }
+
+  const saveItems = (payload: Array<ConfigItem & { config_value: string }>, group?: string) => {
     saveMutation.mutate(payload, {
       onSuccess: async () => {
         toast.success("配置已保存")
@@ -134,134 +185,176 @@ export function SystemConfigPage() {
     })
   }
 
-  const renderConfigField = (item: ConfigItem) => {
+  const renderConfigValue = (item: ConfigItem) => {
     const key = String(item.config_key ?? "")
     const value = valueOf(item)
-    const isLong = key.includes("prompt")
-    const label = String(item.name ?? key)
     if (key === "ai_type") {
       return (
-        <Field key={String(item.id)}>
-          <FieldLabel>AI 类型</FieldLabel>
-          <Select value={value || "ollama"} onValueChange={(next) => setDraft(key, next)}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="ollama">Ollama</SelectItem>
-                <SelectItem value="deepseek">Deepseek</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </Field>
+        <Select value={value || "ollama"} onValueChange={(next) => setDraft(key, next)}>
+          <SelectTrigger className="min-w-[220px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="ollama">Ollama</SelectItem>
+              <SelectItem value="deepseek">Deepseek</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       )
     }
 
     if (booleanKeys.includes(key)) {
       return (
-        <Field key={String(item.id)}>
-          <FieldLabel>{label}</FieldLabel>
-          <Select value={value || booleanOptions(key)[1].value} onValueChange={(next) => setDraft(key, next)}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                {booleanOptions(key).map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </Field>
+        <Select value={value || booleanOptions(key)[1].value} onValueChange={(next) => setDraft(key, next)}>
+          <SelectTrigger className="min-w-[180px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              {booleanOptions(key).map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       )
     }
 
     if (key === "webhook_url") {
       return (
-        <Field key={String(item.id)}>
-          <FieldLabel htmlFor={`config-${key}`}>{label}</FieldLabel>
-          <div className="flex gap-2">
-            <Input id={`config-${key}`} value={value} onChange={(event) => setDraft(key, event.target.value)} />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setDraft(key, window.location.origin)}
-            >
-              <Link data-icon="inline-start" />
-              当前地址
-            </Button>
-          </div>
-        </Field>
+        <div className="flex min-w-[320px] items-center gap-2">
+          <Input value={value} onChange={(event) => setDraft(key, event.target.value)} />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setDraft(key, window.location.origin)}
+          >
+            <Link data-icon="inline-start" />
+            当前地址
+          </Button>
+        </div>
       )
     }
 
     if (key === "system_logo") {
       return (
-        <Field key={String(item.id)}>
-          <FieldLabel htmlFor={`config-${key}`}>{label}</FieldLabel>
-          <div className="flex flex-col gap-3">
-            {value ? (
-              <div className="flex items-center gap-3 rounded-lg border bg-muted/10 p-3">
-                <img src={value} alt="system logo" className="size-16 rounded-lg border bg-background object-contain p-1" />
-                <Badge variant="outline" className="truncate">
-                  {value}
-                </Badge>
-              </div>
-            ) : null}
-            <Input id={`config-${key}`} value={value} onChange={(event) => setDraft(key, event.target.value)} />
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={async () => {
-                  const input = document.createElement("input")
-                  input.type = "file"
-                  input.accept = "image/png,image/jpeg,image/jpg,image/svg+xml"
-                  input.onchange = async () => {
-                    const file = input.files?.[0]
-                    if (!file) {
-                      return
-                    }
-                    const data = await uploadSystemLogo(file)
-                    setDraft(key, String(data.url ?? ""))
-                    toast.success("Logo 已上传")
-                  }
-                  input.click()
-                }}
-              >
-                <ImageUp data-icon="inline-start" />
-                上传 Logo
-              </Button>
+        <div className="flex min-w-[280px] flex-col gap-3">
+          {value ? (
+            <div className="flex items-center gap-3 rounded-lg border bg-muted/10 p-3">
+              <img src={value} alt="system logo" className="size-16 rounded-lg border bg-background object-contain p-1" />
+              <div className="text-sm text-muted-foreground">已上传 Logo</div>
             </div>
-          </div>
-        </Field>
+          ) : null}
+          <Button
+            type="button"
+            variant="outline"
+            className="w-fit"
+            onClick={async () => {
+              const input = document.createElement("input")
+              input.type = "file"
+              input.accept = "image/png,image/jpeg,image/jpg,image/svg+xml"
+              input.onchange = async () => {
+                const file = input.files?.[0]
+                if (!file) {
+                  return
+                }
+                const data = await uploadSystemLogo(file)
+                setDraft(key, String(data.url ?? ""))
+                toast.success("Logo 已上传")
+              }
+              input.click()
+            }}
+          >
+            <ImageUp data-icon="inline-start" />
+            上传 Logo
+          </Button>
+        </div>
       )
     }
 
+    const isLong = key.includes("prompt")
     return (
-      <Field key={String(item.id)}>
-        <FieldLabel htmlFor={`config-${key}`}>{label}</FieldLabel>
-        {isLong ? (
-          <Textarea id={`config-${key}`} rows={7} value={value} onChange={(event) => setDraft(key, event.target.value)} />
-        ) : (
-          <Input
-            id={`config-${key}`}
-            type={passwordKeys.includes(key) ? "password" : "text"}
-            value={value}
-            onChange={(event) => setDraft(key, event.target.value)}
-          />
-        )}
-      </Field>
+      isLong ? (
+        <Textarea rows={7} value={value} onChange={(event) => setDraft(key, event.target.value)} />
+      ) : (
+        <Input
+          type={passwordKeys.includes(key) ? "password" : "text"}
+          value={value}
+          onChange={(event) => setDraft(key, event.target.value)}
+        />
+      )
+    )
+  }
+
+  if (configsQuery.isLoading) {
+    return (
+      <PageLayout>
+        <Card className="console-panel border-0">
+          <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
+            <CardTitle className="text-sm font-medium">参数配置</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 text-sm text-muted-foreground">正在加载配置…</CardContent>
+        </Card>
+      </PageLayout>
+    )
+  }
+
+  if (configsQuery.isError) {
+    return (
+      <PageLayout>
+        <Card className="console-panel border-0">
+          <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
+            <CardTitle className="text-sm font-medium">参数配置</CardTitle>
+          </CardHeader>
+          <CardContent className="p-3">
+            <Empty className="border bg-background py-10">
+              <EmptyHeader>
+                <EmptyTitle>配置加载失败</EmptyTitle>
+              </EmptyHeader>
+              <EmptyContent>
+                <Button size="sm" variant="outline" onClick={() => void configsQuery.refetch()}>
+                  <RefreshCw data-icon="inline-start" />
+                  重新加载
+                </Button>
+              </EmptyContent>
+            </Empty>
+          </CardContent>
+        </Card>
+      </PageLayout>
+    )
+  }
+
+  if (!items.length) {
+    return (
+      <PageLayout>
+        <Card className="console-panel border-0">
+          <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
+            <CardTitle className="text-sm font-medium">参数配置</CardTitle>
+          </CardHeader>
+          <CardContent className="p-3">
+            <Empty className="border bg-background py-10">
+              <EmptyHeader>
+                <EmptyTitle>暂无配置数据</EmptyTitle>
+              </EmptyHeader>
+              <EmptyContent>
+                <Button size="sm" variant="outline" onClick={() => void configsQuery.refetch()}>
+                  <RefreshCw data-icon="inline-start" />
+                  刷新配置
+                </Button>
+              </EmptyContent>
+            </Empty>
+          </CardContent>
+        </Card>
+      </PageLayout>
     )
   }
 
   return (
     <PageLayout>
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="gap-4">
+      <Tabs value={activeTabValue} onValueChange={setActiveTab} className="gap-4">
         <TabsList className="app-shell-surface h-auto flex-wrap justify-start gap-2 rounded-2xl border p-1.5">
           {tabMeta.map((tab) => (
             <TabsTrigger key={tab.value} value={tab.value}>
@@ -272,40 +365,96 @@ export function SystemConfigPage() {
 
         {tabMeta.map((tab) => (
           <TabsContent key={tab.value} value={tab.value}>
-            <Card className="console-panel border-0">
-              <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex min-w-0 flex-col gap-1">
-                    <CardTitle className="text-sm font-medium">{tab.label}配置</CardTitle>
-                    <div className="text-xs text-muted-foreground">集中维护当前分组的系统参数与连接配置</div>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant="secondary">{grouped[tab.value]?.length ?? 0} 项</Badge>
-                    <Button size="sm" onClick={() => saveGroup(tab.value)}>
-                      保存
-                    </Button>
-                    {tab.value === "email" ? (
-                      <Button size="sm" variant="outline" onClick={() => setTestEmailOpen(true)}>
-                        <Mail data-icon="inline-start" />
-                        测试邮件
+            {(sectioned[tab.value] ?? []).length ? (
+              <div className="flex flex-col gap-4">
+                {tab.value !== "system" ? (
+                  <Card className="console-panel border-0">
+                    <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <CardTitle className="text-sm font-medium">{tab.label}配置</CardTitle>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Badge variant="secondary">{grouped[tab.value]?.length ?? 0} 项</Badge>
+                          <Button size="sm" onClick={() => saveGroup(tab.value)}>
+                            保存
+                          </Button>
+                          {tab.value === "email" ? (
+                            <Button size="sm" variant="outline" onClick={() => setTestEmailOpen(true)}>
+                              <Mail data-icon="inline-start" />
+                              测试邮件
+                            </Button>
+                          ) : null}
+                          {tab.value === "wechat" ? (
+                            <Button size="sm" variant="outline" onClick={() => setTestWechatOpen(true)}>
+                              <MessageCircle data-icon="inline-start" />
+                              测试企业微信
+                            </Button>
+                          ) : null}
+                        </div>
+                      </div>
+                    </CardHeader>
+                  </Card>
+                ) : null}
+
+                {sectioned[tab.value].map((section) => (
+                  <Card key={section.key} className="console-panel border-0">
+                    <CardHeader className="border-b bg-muted/10 px-3 py-2.5">
+                      <div className="flex items-center justify-between gap-3">
+                        <CardTitle className="text-sm font-medium">{section.title}</CardTitle>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">{section.items.length} 项</Badge>
+                          {tab.value === "system" ? (
+                            <Button size="sm" onClick={() => saveItems(section.items.map((item) => ({
+                              ...item,
+                              config_value: valueOf(item),
+                            })), "system")}>
+                              保存
+                            </Button>
+                          ) : null}
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-[220px]">配置项</TableHead>
+                            <TableHead className="w-[320px]">说明</TableHead>
+                            <TableHead>值</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {section.items.map((item) => (
+                            <TableRow key={String(item.id)}>
+                              <TableCell className="font-medium">{String(item.name ?? item.config_key ?? "-")}</TableCell>
+                              <TableCell className="max-w-[320px] whitespace-normal text-sm text-muted-foreground">
+                                {String(item.comment ?? "-")}
+                              </TableCell>
+                              <TableCell>{renderConfigValue(item)}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <Card className="console-panel border-0">
+                <CardContent className="p-3">
+                  <Empty className="border bg-background py-10">
+                    <EmptyHeader>
+                      <EmptyTitle>当前分组暂无可配置项</EmptyTitle>
+                    </EmptyHeader>
+                    <EmptyContent>
+                      <Button size="sm" variant="outline" onClick={() => void queryClient.invalidateQueries({ queryKey: ["system-config-list"] })}>
+                        <RefreshCw data-icon="inline-start" />
+                        刷新配置
                       </Button>
-                    ) : null}
-                    {tab.value === "wechat" ? (
-                      <Button size="sm" variant="outline" onClick={() => setTestWechatOpen(true)}>
-                        <MessageCircle data-icon="inline-start" />
-                        测试企业微信
-                      </Button>
-                    ) : null}
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-3">
-                <FieldGroup>
-                  {tab.value === "ai" ? <FieldSeparator>{aiType === "deepseek" ? "Deepseek" : "Ollama"}</FieldSeparator> : null}
-                  {(grouped[tab.value] ?? []).map(renderConfigField)}
-                </FieldGroup>
-              </CardContent>
-            </Card>
+                    </EmptyContent>
+                  </Empty>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
         ))}
       </Tabs>

@@ -8,6 +8,7 @@ import { PageLayout } from "@/components/page-layout"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { getTopology } from "@/services/resources"
 import { toast } from "sonner"
 
 type TopologyViewPageProps = {
@@ -25,8 +26,11 @@ export function TopologyViewPage({ publicMode = false }: TopologyViewPageProps) 
   const query = useQuery({
     queryKey: ["topology-view", id, publicMode],
     queryFn: async () => {
-      const endpoint = publicMode ? `/public/topology/${id}` : `/v1/topology/${id}`
-      const response = await fetch(endpoint)
+      if (!publicMode) {
+        return getTopology(id)
+      }
+
+      const response = await fetch(`/public/topology/${id}`)
       const payload = (await response.json()) as { data?: Record<string, unknown> }
       return payload.data ?? null
     },
@@ -39,7 +43,7 @@ export function TopologyViewPage({ publicMode = false }: TopologyViewPageProps) 
     }
 
     const protocol = window.location.protocol === "https:" ? "wss" : "ws"
-    const path = publicMode ? `/ws/pub/${id}` : `/ws/${id}`
+    const path = publicMode ? `/ws/pub/${id}` : `/ws/auth/${id}`
     const socket = new WebSocket(`${protocol}://${window.location.host}${path}`)
 
     socket.onopen = () => {
